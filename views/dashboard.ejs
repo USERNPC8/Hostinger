@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Nightwave Host - Dashboard</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Redwave⚡</h2>
+        <a href="/" class="menu-item active">Meus Servidores</a>
+        <a href="#" class="menu-item">Créditos</a>
+        <a href="#" class="menu-item">Suporte</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Seus Bots</h1>
+        </div>
+
+        <div class="card" style="margin-bottom: 30px;">
+            <h3>Novo Bot</h3>
+            <form action="/create" method="POST" style="display: flex; gap: 10px;">
+                <input type="text" name="name" placeholder="Nome do Servidor (ex: MeuBot)" required>
+                <select name="type">
+                    <option value="WhatsApp">Bot WhatsApp (Baileys)</option>
+                    <option value="Discord">Bot Discord</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Criar Servidor</button>
+            </form>
+        </div>
+
+        <div class="server-grid" id="server-grid">
+            <% servers.forEach(server => { %>
+                <div class="card" id="card-<%= server.id %>">
+                    <div style="display:flex; justify-content:space-between;">
+                        <h3><%= server.name %></h3>
+                        <span class="status-dot <%= server.status %>" id="dot-<%= server.id %>"></span>
+                    </div>
+                    <p style="color: var(--text-muted);"><%= server.type %></p>
+                    <p>Status: <strong id="status-<%= server.id %>"><%= server.status.toUpperCase() %></strong></p>
+                    <a href="/server/<%= server.id %>">
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 10px;">Gerenciar</button>
+                    </a>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+    
+    <script>
+        const socket = io();
+        
+        // Escuta mudanças de status de qualquer servidor e atualiza o dashboard
+        socket.on('status-change', (data) => {
+            const dot = document.getElementById(`dot-${data.id}`);
+            const statusText = document.getElementById(`status-${data.id}`);
+            
+            if (dot && statusText) {
+                dot.classList.remove('online', 'offline', 'iniciando...');
+                dot.classList.add(data.status);
+                statusText.textContent = data.status.toUpperCase();
+            }
+        });
+    </script>
+</body>
+</html>
