@@ -1,4 +1,4 @@
-// index.js (Painel Redwave - Versão FINAL)
+// index.js (Painel Redwave - Versão FINAL E FUNCIONAL)
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
@@ -30,7 +30,7 @@ function addLog(server, message, isError = false) {
     io.emit(`log-${server.id}`, logLine);
 }
 
-// --- ROTAS PRINCIPAIS E DO MENU LATERAL (TODAS CORRIGIDAS) ---
+// --- ROTAS PRINCIPAIS E DO MENU LATERAL (Todas funcionais) ---
 
 app.get('/', (req, res) => {
     res.render('dashboard', { servers: servers, botTemplates: botTemplates });
@@ -41,43 +41,31 @@ app.get('/servidores', (req, res) => {
 });
 
 app.get('/loja', (req, res) => {
-    res.render('generic_page', { title: 'Loja de Recursos', activeMenu: 'Loja', content: 'Em breve: Compre créditos e upgrades de hardware. Sistema em manutenção.' });
+    res.render('generic_page', { title: 'Loja de Recursos', content: 'Em breve: Upgrade de hardware e créditos. Sistema em manutenção.' });
 });
 
 app.get('/perfil', (req, res) => {
-    res.render('generic_page', { title: 'Configurações de Perfil', activeMenu: 'Perfil', content: 'Em breve: Gerencie sua conta e chaves API. Sistema em manutenção.' });
+    res.render('generic_page', { title: 'Configurações de Perfil', content: 'Em breve: Gerencie sua conta e chaves API.' });
 });
 
 app.get('/logout', (req, res) => {
-    res.render('generic_page', { title: 'Sessão Encerrada', activeMenu: 'Sair', content: 'Você foi desconectado do Painel Redwave.' });
+    res.render('generic_page', { title: 'Sessão Encerrada', content: 'Você foi desconectado do Painel Redwave.' });
 });
 
-// Rota de Criação de Servidor (Git Clone)
 app.post('/create', (req, res) => {
     const templateName = req.body.template;
     const serverName = req.body.name.trim();
     
     if (!serverName) return res.send('O nome do servidor não pode ser vazio.');
-
     const template = botTemplates.find(t => t.name === templateName);
     if (!template) return res.send('Erro: Template de bot inválido.');
     
     const folderName = serverName.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 30) + '-' + Date.now();
     const serverPath = path.join('./bots', folderName);
     
-    if (!fs.existsSync('./bots')) {
-        fs.mkdirSync('./bots');
-    }
+    if (!fs.existsSync('./bots')) { fs.mkdirSync('./bots'); }
 
-    const newServer = {
-        id: Date.now(),
-        name: serverName,
-        type: template.type,
-        path: serverPath,
-        status: 'cloning',
-        logs: [`[SISTEMA] Iniciando clone de ${template.name}`],
-        process: null
-    };
+    const newServer = { id: Date.now(), name: serverName, type: template.type, path: serverPath, status: 'cloning', logs: [`[SISTEMA] Iniciando clone de ${template.name}`], process: null };
     servers.push(newServer);
     
     const cloneCommand = `git clone ${template.url} ${serverPath}`;
@@ -90,10 +78,8 @@ app.post('/create', (req, res) => {
             io.emit('status-change', { id: newServer.id, status: 'error' });
             return;
         }
-
-        addLog(newServer, `[GIT SUCESSO] Repositório clonado para ${serverPath}.`, false);
+        addLog(newServer, `[GIT SUCESSO] Repositório clonado.`, false);
         addLog(newServer, `[AVISO CRÍTICO] **PASSO OBRIGATÓRIO:** Entre na pasta e execute 'npm install'.`, true);
-        
         newServer.status = 'offline';
         io.emit('status-change', { id: newServer.id, status: 'offline' });
     });
@@ -111,9 +97,9 @@ app.get('/server/:id', (req, res) => {
 
 io.on('connection', (socket) => {
     
-    // Comando Input
     socket.on('send-command', ({ serverId, command }) => {
         const server = servers.find(s => s.id == serverId);
+        // Só permite comandos se o status for 'online' e o processo existir
         if (!server || server.status !== 'online' || !server.process) {
             return socket.emit(`log-${serverId}`, '[ERRO] Servidor offline ou processo indisponível.');
         }
@@ -125,19 +111,13 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Iniciar Servidor
     socket.on('start-server', (serverId) => {
         const server = servers.find(s => s.id == serverId);
         if (!server || server.status === 'online' || server.status === 'cloning' || server.status === 'error') return;
 
         addLog(server, `[SISTEMA] Tentando iniciar bot...`);
         try {
-            // Se o bot não tiver index.js ou dependências, o spawn vai falhar.
-            const botProcess = spawn('node', ['index.js'], { 
-                cwd: server.path, 
-                shell: true 
-            });
-
+            const botProcess = spawn('node', ['index.js'], { cwd: server.path, shell: true });
             server.process = botProcess;
             server.status = 'online';
             io.emit('status-change', { id: serverId, status: 'online' });
@@ -157,7 +137,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Parar Servidor
     socket.on('stop-server', (serverId) => {
         const server = servers.find(s => s.id == serverId);
         if (!server || server.status !== 'online' || !server.process) return;
