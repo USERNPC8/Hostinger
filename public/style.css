@@ -1,18 +1,19 @@
-/* public/style.css - Design Redwave Profissional (Final) */
+/* public/style.css - Design Redwave CYBERPUNK FINAL */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap');
 
-/* Variáveis de Cor - Esquema Neon Profissional */
+/* Variáveis de Cor - Esquema Cyberpunk */
 :root {
-    --bg-main: #0c0c10;         /* Fundo Principal: Escuro */
-    --bg-sidebar: #15151e;      /* Fundo do Menu: Levemente mais claro */
-    --bg-card: #21212c;         /* Fundo do Cartão: Mais definido */
-    --primary: #ff004d;         /* Vermelho Neon Vivo */
-    --primary-shadow: #ff004d60; /* Sombra Neon (60% opacidade) */
-    --text-main: #e5e7eb;       /* Texto Claro */
+    --bg-main: #0a0a10;         /* Fundo Principal: Quase preto */
+    --bg-sidebar: #10101b;      /* Fundo do Menu: Mais escuro, com profundidade */
+    --bg-card: #1f1f2a;         /* Fundo do Cartão: Definido e sólido */
+    --primary: #00e676;         /* Cor Principal: Verde Neon Forte (O contraste do painel) */
+    --secondary: #ff004d;       /* Cor Secundária: Vermelho Neon Vivo (Destaque e Erro) */
+    --primary-shadow: #00e67640; /* Sombra Neon Verde */
+    --text-main: #e5e7eb;       
     --text-muted: #9ca3af;
-    --success: #00e676;         /* Verde Neon */
+    --success: #00e676;         
     --danger: #ff004d;          
-    --border-color: #3f3f5a;    /* Borda sutil */
+    --border-color: #3f3f5a;    
     --input-bg: #1a1a25;
 }
 
@@ -23,6 +24,7 @@ body {
     margin: 0;
     display: flex;
     min-height: 100vh;
+    overflow-x: hidden; /* Evita scroll lateral indesejado */
 }
 
 /* --- Menu Lateral Fixo (Desktop) --- */
@@ -32,10 +34,12 @@ body {
     background-color: var(--bg-sidebar);
     padding: 20px;
     border-right: 1px solid var(--border-color);
-    position: sticky;
+    position: fixed; /* GARANTIA DE FIXAÇÃO */
     top: 0;
+    left: 0;
     height: 100vh;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 3px 0 15px rgba(0, 0, 0, 0.7);
+    z-index: 1000;
 }
 
 .sidebar h2 { 
@@ -43,7 +47,7 @@ body {
     margin-bottom: 35px; 
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 15px;
-    text-shadow: 0 0 8px var(--primary-shadow);
+    text-shadow: 0 0 10px var(--primary-shadow);
 }
 
 .menu-item {
@@ -54,23 +58,26 @@ body {
     border-radius: 4px;
     transition: 0.2s ease-in-out;
     font-weight: 500;
+    border-left: 3px solid transparent;
 }
 .menu-item:hover {
     background-color: var(--bg-card);
-    color: var(--primary);
+    color: var(--text-main);
+    border-left-color: var(--primary);
 }
 .menu-item.active {
-    background-color: var(--primary);
-    color: var(--bg-sidebar);
+    background: linear-gradient(90deg, #00e67610, transparent);
+    color: var(--primary);
     font-weight: 700;
-    box-shadow: 0 0 15px var(--primary-shadow);
-    transform: translateX(5px);
+    border-left-color: var(--primary);
+    box-shadow: 0 0 5px var(--primary-shadow);
 }
 
 .main-content {
     flex: 1;
     padding: 40px;
-    overflow-y: auto;
+    margin-left: 250px; /* Offset para o menu fixo */
+    width: calc(100% - 250px);
 }
 
 .header {
@@ -82,7 +89,7 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-/* --- Cartões e Formulário --- */
+/* --- Cartões e Componentes --- */
 
 .server-grid {
     display: grid;
@@ -105,21 +112,22 @@ body {
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
-    color: var(--text-main);
+    color: var(--bg-sidebar);
     transition: 0.2s;
     text-transform: uppercase;
 }
 .btn-primary { 
-    background-color: var(--primary); 
-    box-shadow: 0 0 10px var(--primary-shadow);
+    background-color: var(--secondary); 
+    box-shadow: 0 0 10px #ff004d60;
+    color: var(--text-main);
 }
-.btn-success { background-color: var(--success); color: var(--bg-card); }
+.btn-success { background-color: var(--success); }
 .btn-danger { background-color: var(--danger); }
 .btn:hover:not(:disabled) { 
     opacity: 0.9;
     transform: translateY(-2px);
 }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Inputs e Selects */
 input, select {
@@ -130,11 +138,11 @@ input, select {
     border-radius: 6px;
     width: 100%;
     box-sizing: border-box;
-    transition: border-color 0.2s;
 }
 input:focus, select:focus {
     outline: none;
     border-color: var(--primary);
+    box-shadow: 0 0 5px var(--primary-shadow);
 }
 
 /* Status Dot */
@@ -152,31 +160,32 @@ input:focus, select:focus {
 .error { background-color: var(--danger); color: var(--danger); }
 
 
-/* --- Terminal Style (Pterodactyl-like) --- */
+/* --- Terminal Style --- */
 
 .terminal-window {
     background-color: #000000;
     border-radius: 6px;
     padding: 15px;
     font-family: 'Roboto Mono', monospace;
-    height: 350px; /* Mais baixo para mobile */
+    height: 400px; 
     overflow-y: scroll;
     border: 1px solid #1a1a20;
     margin-top: 15px;
     line-height: 1.4;
-    white-space: pre-wrap; /* Garante que logs longos quebrem a linha */
+    white-space: pre-wrap;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
 }
 .log-line {
     margin: 2px 0;
     font-size: 13px;
-    color: #0f0; 
+    color: var(--primary); /* Terminal em Verde Neon */
 }
 .error-line {
     color: var(--danger);
     font-weight: 700;
 }
 
-/* Barra de Comando */
+/* Barra de Comando (Estilo Pterodactyl) */
 .command-bar {
     display: flex;
     margin-top: 5px;
@@ -188,7 +197,11 @@ input:focus, select:focus {
     border: 1px solid var(--border-color);
     border-right: none;
     font-family: 'Roboto Mono', monospace;
-    padding: 15px; /* Aumenta o padding para celular */
+    padding: 15px;
+    color: var(--primary);
+}
+.command-bar input:focus {
+    border-color: var(--primary);
 }
 .command-bar button {
     padding: 15px 20px;
@@ -199,42 +212,50 @@ input:focus, select:focus {
 }
 
 
-/* --- RESPONSIVIDADE (CELULAR - FIX FINAL) --- */
+/* --- RESPONSIVIDADE (MOBILE - FIX DEFINITIVO) --- */
 @media (max-width: 768px) {
-    body {
-        flex-direction: column;
-    }
+    
     .sidebar {
         width: 100%;
         height: auto;
-        position: static;
+        position: fixed; /* Mantém a barra fixa no topo */
+        bottom: 0; /* Coloca no rodapé para melhor acesso */
+        left: 0;
+        top: auto;
         border-right: none;
-        border-bottom: 1px solid var(--border-color);
-        padding: 10px 0;
+        border-top: 1px solid var(--border-color);
+        box-shadow: 0 -3px 15px rgba(0, 0, 0, 0.7);
+        padding: 5px 0;
     }
     
+    .sidebar h2 { display: none; }
+    
     /* Menu Horizontal para Mobile */
-    .sidebar h2 { 
-        display: none; /* Oculta o título na barra horizontal */
-    }
     .sidebar-menu {
         display: flex;
-        overflow-x: auto; /* Permite rolar o menu horizontalmente */
+        justify-content: space-around;
+        overflow-x: auto; 
         white-space: nowrap; 
-        padding: 5px 15px;
-        -webkit-overflow-scrolling: touch; /* Melhor rolagem no iOS */
+        padding: 5px 10px;
     }
     .menu-item {
-        flex-shrink: 0; /* Evita que os itens diminuam */
-        margin-right: 15px;
-        padding: 8px 15px; /* Mais compacto */
+        flex-shrink: 0; 
+        margin: 0 5px;
+        padding: 10px 10px;
+        text-align: center;
+        border-left: none;
     }
     .menu-item.active {
-        transform: none; /* Remove a transformação lateral no mobile */
+        background: var(--bg-card);
+        color: var(--primary);
+        border-bottom: 2px solid var(--primary);
+        box-shadow: none;
     }
     
     .main-content {
         padding: 20px 15px;
+        margin-left: 0; /* Remove offset */
+        margin-bottom: 70px; /* Espaço para a barra de navegação inferior */
         width: 100%;
     }
     
@@ -247,8 +268,8 @@ input:focus, select:focus {
     }
     .actions button {
         flex: 1;
-        padding: 18px; /* Aumenta a área de toque */
-        font-size: 1.1em;
+        padding: 15px; 
+        font-size: 1em;
     }
     .server-grid {
         grid-template-columns: 1fr;
