@@ -39,7 +39,7 @@
             </div>
             
             <div class="command-bar">
-                <input type="text" id="command-input" placeholder="Digite um comando aqui (ex: stop, menu)" autocomplete="off" disabled>
+                <input type="text" id="command-input" placeholder="Digite um comando aqui (só funciona ONLINE)" autocomplete="off" disabled>
                 <button onclick="sendCommand()" id="send-btn" disabled>Enviar</button>
             </div>
         </div>
@@ -66,7 +66,7 @@
             statusElement.innerHTML = `${dot} ${status.toUpperCase()}`;
             
             // Habilita/Desabilita botões
-            startBtn.disabled = status === 'online' || status === 'cloning';
+            startBtn.disabled = status === 'online' || status === 'cloning' || status === 'error';
             stopBtn.disabled = status !== 'online';
             
             // Habilita/Desabilita barra de comando
@@ -114,7 +114,7 @@
             }
         });
         
-        // Evento para enviar comando ao apertar ENTER
+        // Envia comando ao apertar ENTER
         commandInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault(); 
@@ -122,7 +122,6 @@
             }
         });
         
-        // Estado inicial
         updateUI(currentStatus);
     </script>
 </body>
