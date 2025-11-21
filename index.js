@@ -30,23 +30,28 @@ function addLog(server, message, isError = false) {
     io.emit(`log-${server.id}`, logLine);
 }
 
-// --- ROTAS PRINCIPAIS ---
+// --- ROTAS PRINCIPAIS (CORRIGIDAS) ---
 
 app.get('/', (req, res) => {
     res.render('dashboard', { servers: servers, botTemplates: botTemplates });
 });
 
-// Rotas para o Menu Lateral (Corrigidas)
+// Rotas para o Menu Lateral (AGORA FUNCIONAIS)
 app.get('/servidores', (req, res) => {
+    // Redireciona para a home, que é a lista de servidores
     res.redirect('/');
 });
 
 app.get('/loja', (req, res) => {
-    res.render('generic_page', { title: 'Loja', content: 'Em breve: Compre recursos e upgrades. A Rede está em manutenção.' });
+    res.render('generic_page', { title: 'Loja', content: 'Em breve: Compre créditos e recursos adicionais. A Rede está em manutenção.' });
 });
 
 app.get('/perfil', (req, res) => {
     res.render('generic_page', { title: 'Perfil', content: 'Em breve: Gerencie sua conta e configurações. A Rede está em manutenção.' });
+});
+
+app.get('/logout', (req, res) => {
+    res.render('generic_page', { title: 'Sessão Encerrada', content: 'Você foi desconectado. Para entrar novamente, use a aplicação real.' });
 });
 
 
@@ -61,7 +66,7 @@ app.post('/create', (req, res) => {
     if (!template) return res.send('Erro: Template de bot inválido.');
     
     const folderName = serverName.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 30) + '-' + Date.now();
-    const serverPath = path.join('./bots', folderName); // Usa path.join para compatibilidade
+    const serverPath = path.join('./bots', folderName);
     
     if (!fs.existsSync('./bots')) {
         fs.mkdirSync('./bots');
@@ -84,14 +89,14 @@ app.post('/create', (req, res) => {
     exec(cloneCommand, { timeout: 120000 }, (error, stdout, stderr) => {
         if (error) {
             addLog(newServer, `[GIT ERRO] Falha ao clonar. ${error.message}`, true);
-            addLog(newServer, `[GIT ERRO] Certifique-se de que o GIT está instalado no sistema.`, true);
+            addLog(newServer, `[GIT ERRO] **Aviso Crítico:** Certifique-se de que o GIT está instalado.`, true);
             newServer.status = 'error';
             io.emit('status-change', { id: newServer.id, status: 'error' });
             return;
         }
 
         addLog(newServer, `[GIT SUCESSO] Repositório clonado.`, false);
-        addLog(newServer, `[AVISO] Instale as dependências: vá para a pasta ${serverPath} e execute 'npm install'.`, true);
+        addLog(newServer, `[AVISO CRÍTICO] Instale as dependências: vá para a pasta ${serverPath} e execute 'npm install'.`, true);
         
         newServer.status = 'offline';
         io.emit('status-change', { id: newServer.id, status: 'offline' });
@@ -106,11 +111,10 @@ app.get('/server/:id', (req, res) => {
     res.render('server', { server: server });
 });
 
-// --- CONTROLE VIA SOCKET.IO ---
+// --- CONTROLE VIA SOCKET.IO (COMANDOS) ---
 
 io.on('connection', (socket) => {
     
-    // Enviar Comando para o Terminal
     socket.on('send-command', ({ serverId, command }) => {
         const server = servers.find(s => s.id == serverId);
         if (!server || server.status !== 'online' || !server.process) {
@@ -119,13 +123,13 @@ io.on('connection', (socket) => {
 
         const cleanCommand = command.trim();
         if (cleanCommand.length > 0) {
-            // Escreve o comando no stdin do processo do bot (CORREÇÃO DE FLUXO)
             server.process.stdin.write(cleanCommand + '\n'); 
             addLog(server, `[COMANDO: ${cleanCommand}]`, false);
         }
     });
 
-    // Iniciar Servidor
+    // ... (Mantém start-server e stop-server) ...
+
     socket.on('start-server', (serverId) => {
         const server = servers.find(s => s.id == serverId);
         if (!server || server.status === 'online' || server.status === 'cloning') return;
@@ -156,7 +160,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Parar Servidor
     socket.on('stop-server', (serverId) => {
         const server = servers.find(s => s.id == serverId);
         if (!server || server.status !== 'online' || !server.process) return;
