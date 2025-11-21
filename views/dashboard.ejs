@@ -11,8 +11,7 @@
     <div class="sidebar">
         <h2>Redwave ⚡</h2>
         <div class="sidebar-menu">
-            <a href="/" class="menu-item active">🏠 Home</a>
-            <a href="/servidores" class="menu-item">⚙️ Servidores</a>
+            <a href="/" class="menu-item active">🏠 Servidores</a>
             <a href="/loja" class="menu-item">🛍️ Loja</a>
             <a href="/perfil" class="menu-item">👤 Perfil</a>
             <a href="/logout" class="menu-item" style="margin-top: 50px;">🔴 Sair</a>
@@ -25,7 +24,7 @@
         </div>
 
         <div class="card" style="margin-bottom: 30px;">
-            <h3>Clonar Novo Servidor do GitHub</h3>
+            <h3>Clonar Novo Servidor (GitHub)</h3>
             <form action="/create" method="POST" style="display: flex; flex-wrap: wrap; gap: 10px;">
                 <select name="template" required style="flex-grow: 1;">
                     <option value="" disabled selected>Escolha o Bot para Clonar</option>
@@ -36,12 +35,12 @@
                 <input type="text" name="name" placeholder="Nome do Servidor (ex: MeuBot)" required style="flex-grow: 2;">
                 <button type="submit" class="btn btn-primary" style="flex-grow: 1;">Clonar e Criar</button>
             </form>
-            <p style="font-size: 0.8em; color: var(--danger); margin-top: 10px;">
+            <p style="font-size: 0.8em; color: var(--secondary); margin-top: 10px;">
                 ⚠️ **AVISO CRÍTICO:** Após a clonagem, **você deve** rodar `npm install` na pasta do bot antes de INICIAR.
             </p>
         </div>
 
-        <h2>Servidores Ativos (<%= servers.length %>)</h2>
+        <h2>Meus Servidores Ativos (<%= servers.length %>)</h2>
         <div class="server-grid" id="server-grid">
             <% servers.forEach(server => { %>
                 <div class="card" id="card-<%= server.id %>">
@@ -67,7 +66,7 @@
             const statusText = document.getElementById(`status-${data.id}`);
             
             if (dot && statusText) {
-                dot.classList.remove('online', 'offline', 'cloning', 'error');
+                dot.classList.remove('online', 'offline', 'cloning', 'error', 'iniciando', 'parando');
                 dot.classList.add(data.status);
                 statusText.textContent = data.status.toUpperCase();
             }
