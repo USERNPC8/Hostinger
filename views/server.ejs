@@ -13,7 +13,7 @@
         <div class="sidebar-menu">
             <a href="/" class="menu-item">🏠 Home</a>
             <a href="/server/<%= server.id %>" class="menu-item active">⚙️ <%= server.name %></a>
-            <a href="/shop" class="menu-item">🛍️ Loja</a>
+            <a href="/loja" class="menu-item">🛍️ Loja</a>
         </div>
     </div>
 
@@ -39,8 +39,8 @@
             </div>
             
             <div class="command-bar">
-                <input type="text" id="command-input" placeholder="Digite um comando aqui (ex: menu, stop)" autocomplete="off">
-                <button onclick="sendCommand()">Enviar</button>
+                <input type="text" id="command-input" placeholder="Digite um comando aqui (ex: stop, menu)" autocomplete="off" disabled>
+                <button onclick="sendCommand()" id="send-btn" disabled>Enviar</button>
             </div>
         </div>
     </div>
@@ -53,9 +53,10 @@
         const startBtn = document.getElementById('start-btn');
         const stopBtn = document.getElementById('stop-btn');
         const commandInput = document.getElementById('command-input');
+        const sendBtn = document.getElementById('send-btn');
         let currentStatus = '<%= server.status %>';
 
-        // --- Funções de UI e Status ---
+        // --- Funções de UI e Status (CORRIGIDAS) ---
 
         function updateUI(status) {
             currentStatus = status;
@@ -64,13 +65,25 @@
             
             statusElement.innerHTML = `${dot} ${status.toUpperCase()}`;
             
-            startBtn.disabled = status === 'online' || status === 'cloning' || status === 'error';
-            stopBtn.disabled = status === 'offline' || status === 'cloning' || status === 'error';
+            // Habilita/Desabilita botões
+            startBtn.disabled = status === 'online' || status === 'cloning';
+            stopBtn.disabled = status !== 'online';
+            
+            // Habilita/Desabilita barra de comando
             commandInput.disabled = status !== 'online';
+            sendBtn.disabled = status !== 'online';
         }
 
         // --- Funções de Controle (Socket.io) ---
-
+        
+        function sendCommand() {
+            const command = commandInput.value.trim();
+            if (command && currentStatus === 'online') {
+                socket.emit('send-command', { serverId, command });
+                commandInput.value = '';
+            }
+        }
+        
         function startServer() {
             if (currentStatus !== 'online') {
                 socket.emit('start-server', serverId);
@@ -84,19 +97,9 @@
                 updateUI('parando');
             }
         }
-        
-        // NOVO: Enviar Comando
-        function sendCommand() {
-            const command = commandInput.value.trim();
-            if (command && currentStatus === 'online') {
-                socket.emit('send-command', { serverId, command });
-                commandInput.value = ''; // Limpa o input
-            }
-        }
 
         // --- Eventos ---
 
-        // Escuta logs em tempo real
         socket.on(`log-${serverId}`, (msg) => {
             const div = document.createElement('div');
             div.className = msg.includes('🚨 ERROR') || msg.includes('[ERRO]') ? 'log-line error-line' : 'log-line'; 
@@ -105,7 +108,6 @@
             terminal.scrollTop = terminal.scrollHeight;
         });
 
-        // Escuta mudanças de status
         socket.on('status-change', (data) => {
             if (data.id == serverId) {
                 updateUI(data.status);
@@ -115,11 +117,12 @@
         // Evento para enviar comando ao apertar ENTER
         commandInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
-                event.preventDefault(); // Impede quebra de linha
+                event.preventDefault(); 
                 sendCommand();
             }
         });
         
+        // Estado inicial
         updateUI(currentStatus);
     </script>
 </body>
