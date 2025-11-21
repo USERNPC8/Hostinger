@@ -1,4 +1,4 @@
-// index.js (Painel Redwave - Versão Final)
+// index.js (Painel Redwave - Versão FINAL)
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
@@ -30,30 +30,27 @@ function addLog(server, message, isError = false) {
     io.emit(`log-${server.id}`, logLine);
 }
 
-// --- ROTAS PRINCIPAIS (CORRIGIDAS) ---
+// --- ROTAS PRINCIPAIS E DO MENU LATERAL (TODAS CORRIGIDAS) ---
 
 app.get('/', (req, res) => {
     res.render('dashboard', { servers: servers, botTemplates: botTemplates });
 });
 
-// Rotas para o Menu Lateral (AGORA FUNCIONAIS)
 app.get('/servidores', (req, res) => {
-    // Redireciona para a home, que é a lista de servidores
     res.redirect('/');
 });
 
 app.get('/loja', (req, res) => {
-    res.render('generic_page', { title: 'Loja', content: 'Em breve: Compre créditos e recursos adicionais. A Rede está em manutenção.' });
+    res.render('generic_page', { title: 'Loja de Recursos', activeMenu: 'Loja', content: 'Em breve: Compre créditos e upgrades de hardware. Sistema em manutenção.' });
 });
 
 app.get('/perfil', (req, res) => {
-    res.render('generic_page', { title: 'Perfil', content: 'Em breve: Gerencie sua conta e configurações. A Rede está em manutenção.' });
+    res.render('generic_page', { title: 'Configurações de Perfil', activeMenu: 'Perfil', content: 'Em breve: Gerencie sua conta e chaves API. Sistema em manutenção.' });
 });
 
 app.get('/logout', (req, res) => {
-    res.render('generic_page', { title: 'Sessão Encerrada', content: 'Você foi desconectado. Para entrar novamente, use a aplicação real.' });
+    res.render('generic_page', { title: 'Sessão Encerrada', activeMenu: 'Sair', content: 'Você foi desconectado do Painel Redwave.' });
 });
-
 
 // Rota de Criação de Servidor (Git Clone)
 app.post('/create', (req, res) => {
@@ -89,14 +86,13 @@ app.post('/create', (req, res) => {
     exec(cloneCommand, { timeout: 120000 }, (error, stdout, stderr) => {
         if (error) {
             addLog(newServer, `[GIT ERRO] Falha ao clonar. ${error.message}`, true);
-            addLog(newServer, `[GIT ERRO] **Aviso Crítico:** Certifique-se de que o GIT está instalado.`, true);
             newServer.status = 'error';
             io.emit('status-change', { id: newServer.id, status: 'error' });
             return;
         }
 
-        addLog(newServer, `[GIT SUCESSO] Repositório clonado.`, false);
-        addLog(newServer, `[AVISO CRÍTICO] Instale as dependências: vá para a pasta ${serverPath} e execute 'npm install'.`, true);
+        addLog(newServer, `[GIT SUCESSO] Repositório clonado para ${serverPath}.`, false);
+        addLog(newServer, `[AVISO CRÍTICO] **PASSO OBRIGATÓRIO:** Entre na pasta e execute 'npm install'.`, true);
         
         newServer.status = 'offline';
         io.emit('status-change', { id: newServer.id, status: 'offline' });
@@ -115,6 +111,7 @@ app.get('/server/:id', (req, res) => {
 
 io.on('connection', (socket) => {
     
+    // Comando Input
     socket.on('send-command', ({ serverId, command }) => {
         const server = servers.find(s => s.id == serverId);
         if (!server || server.status !== 'online' || !server.process) {
@@ -128,14 +125,14 @@ io.on('connection', (socket) => {
         }
     });
 
-    // ... (Mantém start-server e stop-server) ...
-
+    // Iniciar Servidor
     socket.on('start-server', (serverId) => {
         const server = servers.find(s => s.id == serverId);
-        if (!server || server.status === 'online' || server.status === 'cloning') return;
+        if (!server || server.status === 'online' || server.status === 'cloning' || server.status === 'error') return;
 
         addLog(server, `[SISTEMA] Tentando iniciar bot...`);
         try {
+            // Se o bot não tiver index.js ou dependências, o spawn vai falhar.
             const botProcess = spawn('node', ['index.js'], { 
                 cwd: server.path, 
                 shell: true 
@@ -160,6 +157,7 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Parar Servidor
     socket.on('stop-server', (serverId) => {
         const server = servers.find(s => s.id == serverId);
         if (!server || server.status !== 'online' || !server.process) return;
