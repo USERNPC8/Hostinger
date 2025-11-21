@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciar <%= server.name %> | Painel Redwave</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Redwave⚡</h2>
+        <a href="/" class="menu-item">← Voltar</a>
+        <div style="margin-top: 20px; padding-left: 10px; color: var(--text-muted); font-size: 12px;">
+            SERVIDOR
+        </div>
+        <a href="#" class="menu-item active">Console</a>
+        <a href="#" class="menu-item">Arquivos</a>
+        <a href="#" class="menu-item">Configuração</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h1><%= server.name %></h1>
+                <span style="color: var(--text-muted);">ID: <%= server.id %> | Caminho: <%= server.path %></span>
+                <p>Status: <strong id="server-status"><span class="status-dot <%= server.status %>"></span> <%= server.status.toUpperCase() %></strong></p>
+            </div>
+            <div class="actions">
+                <button id="start-btn" onclick="startServer()" class="btn btn-success">INICIAR</button>
+                <button id="stop-btn" onclick="stopServer()" class="btn btn-danger">PARAR</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Terminal / Logs</h3>
+            <div class="terminal-window" id="terminal">
+                <div class="log-line">[SISTEMA] Conectando ao socket do painel...</div>
+                <% server.logs.slice(-50).forEach(log => { %>
+                    <div class="log-line"><%= log %></div>
+                <% }) %>
+            </div>
+            </div>
+    </div>
+
+    <script>
+        const socket = io();
+        const serverId = '<%= server.id %>';
+        const terminal = document.getElementById('terminal');
+        const statusElement = document.getElementById('server-status');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        let currentStatus = '<%= server.status %>';
+
+        // Função para atualizar o status visualmente
+        function updateUI(status) {
+            currentStatus = status;
+            const dot = status === 'online' ? '<span class="status-dot online"></span>' : '<span class="status-dot offline"></span>';
+            
+            statusElement.innerHTML = `${dot} ${status.toUpperCase()}`;
+            
+            // Habilita/Desabilita botões
+            startBtn.disabled = status === 'online';
+            stopBtn.disabled = status === 'offline';
+        }
+
+        // 1. Escuta logs em tempo real
+        socket.on(`log-${serverId}`, (msg) => {
+            const div = document.createElement('div');
+            // Adiciona classe de erro se a mensagem contiver a flag de erro (definida no backend)
+            div.className = msg.includes('[ERRO]') || msg.includes('🚨 ERROR') ? 'log-line error-line' : 'log-line'; 
+            div.textContent = msg;
+            terminal.appendChild(div);
+            terminal.scrollTop = terminal.scrollHeight; // Auto-scroll
+        });
+
+        // 2. Escuta mudanças de status enviadas pelo Backend
+        socket.on('status-change', (data) => {
+            if (data.id == serverId) {
+                updateUI(data.status);
+            }
+        });
+
+        // Funções de controle
+        function startServer() {
+            if (currentStatus !== 'online') {
+                socket.emit('start-server', serverId);
+                updateUI('iniciando...'); // Feedback imediato
+            }
+        }
+
+        function stopServer() {
+            if (currentStatus === 'online') {
+                socket.emit('stop-server', serverId);
+                updateUI('parando...'); // Feedback imediato
+            }
+        }
+        
+        // Inicializa o estado dos botões ao carregar
+        updateUI(currentStatus);
+    </script>
+</body>
+</html>
