@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redwave Host - Dashboard</title>
+    <title>Redwave Host - Dashboard FUTURISTA</title>
     <link rel="stylesheet" href="/style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
     <div class="sidebar">
-        <h2>Redwave ⚡</h2>
+        <h2>REDWAVE ⚡</h2>
         <div class="sidebar-menu">
-            <a href="/" class="menu-item active">🏠 Servidores</a>
+            <a href="/" class="menu-item active">🔥 Servidores</a>
             <a href="/loja" class="menu-item">🛍️ Loja</a>
             <a href="/perfil" class="menu-item">👤 Perfil</a>
             <a href="/logout" class="menu-item" style="margin-top: 50px;">🔴 Sair</a>
@@ -20,7 +20,7 @@
 
     <div class="main-content">
         <div class="header">
-            <h1>Painel de Gerenciamento</h1>
+            <h1>Painel de Gerenciamento FUTURISTA</h1>
         </div>
 
         <div class="card" style="margin-bottom: 30px;">
@@ -33,7 +33,7 @@
                     <% }) %>
                 </select>
                 <input type="text" name="name" placeholder="Nome do Servidor (ex: MeuBot)" required style="flex-grow: 2;">
-                <button type="submit" class="btn btn-primary" style="flex-grow: 1;">Clonar e Criar</button>
+                <button type="submit" class="btn btn-primary" style="flex-grow: 1;">CLONAR & INICIAR</button>
             </form>
             <p style="font-size: 0.8em; color: var(--secondary); margin-top: 10px;">
                 ⚠️ **AVISO CRÍTICO:** Após a clonagem, **você deve** rodar `npm install` na pasta do bot antes de INICIAR.
@@ -51,7 +51,7 @@
                     <p style="color: var(--text-muted);"><%= server.type %></p>
                     <p>Status: <strong id="status-<%= server.id %>"><%= server.status.toUpperCase() %></strong></p>
                     <a href="/server/<%= server.id %>">
-                        <button class="btn btn-primary" style="width: 100%; margin-top: 10px;">Gerenciar Terminal</button>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 10px;">GERENCIAR CONSOLE</button>
                     </a>
                 </div>
             <% }) %>
@@ -60,11 +60,9 @@
     
     <script>
         const socket = io();
-        
         socket.on('status-change', (data) => {
             const dot = document.getElementById(`dot-${data.id}`);
             const statusText = document.getElementById(`status-${data.id}`);
-            
             if (dot && statusText) {
                 dot.classList.remove('online', 'offline', 'cloning', 'error', 'iniciando', 'parando');
                 dot.classList.add(data.status);
