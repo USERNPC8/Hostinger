@@ -9,9 +9,9 @@
 </head>
 <body>
     <div class="sidebar">
-        <h2>Redwave ⚡</h2>
+        <h2>REDWAVE ⚡</h2>
         <div class="sidebar-menu">
-            <a href="/" class="menu-item">🏠 Servidores</a>
+            <a href="/" class="menu-item">🔥 Servidores</a>
             <a href="/server/<%= server.id %>" class="menu-item active">⚙️ <%= server.name %></a>
             <a href="/loja" class="menu-item">🛍️ Loja</a>
             <a href="/perfil" class="menu-item">👤 Perfil</a>
@@ -40,7 +40,7 @@
             </div>
             
             <div class="command-bar">
-                <input type="text" id="command-input" placeholder="Digite um comando aqui (só funciona ONLINE)" autocomplete="off" disabled>
+                <input type="text" id="command-input" placeholder="Digite um comando aqui (SÓ FUNCIONA ONLINE)" autocomplete="off" disabled>
                 <button onclick="sendCommand()" id="send-btn" disabled>Enviar</button>
             </div>
         </div>
@@ -58,7 +58,6 @@
         let currentStatus = '<%= server.status %>';
 
         // --- Funções de UI e Status (GARANTINDO HABILITAÇÃO) ---
-
         function updateUI(status) {
             currentStatus = status;
             const dotClass = status === 'online' ? 'online' : status === 'offline' ? 'offline' : status === 'cloning' ? 'cloning' : 'error';
@@ -70,13 +69,12 @@
             startBtn.disabled = status === 'online' || status === 'cloning' || status === 'error' || status === 'iniciando';
             stopBtn.disabled = status !== 'online';
             
-            // Habilita/Desabilita barra de comando
+            // HABILITA/DESABILITA BARRA DE COMANDO (AQUI ESTÁ A LÓGICA)
             commandInput.disabled = status !== 'online';
             sendBtn.disabled = status !== 'online';
         }
 
         // --- Funções de Controle (Socket.io) ---
-        
         function sendCommand() {
             const command = commandInput.value.trim();
             if (command && currentStatus === 'online') {
@@ -84,14 +82,12 @@
                 commandInput.value = '';
             }
         }
-        
         function startServer() {
             if (currentStatus !== 'online') {
                 socket.emit('start-server', serverId);
                 updateUI('iniciando');
             }
         }
-
         function stopServer() {
             if (currentStatus === 'online') {
                 socket.emit('stop-server', serverId);
@@ -100,10 +96,8 @@
         }
 
         // --- Eventos ---
-
         socket.on(`log-${serverId}`, (msg) => {
             const div = document.createElement('div');
-            // Garante que logs longos quebrem a linha no console
             div.className = msg.includes('🚨 ERROR') || msg.includes('[ERRO]') ? 'log-line error-line' : 'log-line'; 
             div.textContent = msg;
             terminal.appendChild(div);
