@@ -36,8 +36,8 @@
                 <input type="text" name="name" placeholder="Nome do Servidor (ex: MeuBot)" required style="flex-grow: 2;">
                 <button type="submit" class="btn btn-primary" style="flex-grow: 1;">Clonar e Criar</button>
             </form>
-            <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 10px;">
-                ⚠️ **Atenção:** Instale as dependências com `npm install` na pasta clonada antes de iniciar o bot.
+            <p style="font-size: 0.8em; color: var(--danger); margin-top: 10px;">
+                ⚠️ **AVISO CRÍTICO:** Após a clonagem, **você deve** rodar `npm install` na pasta do bot antes de INICIAR.
             </p>
         </div>
 
@@ -49,7 +49,7 @@
                         <h3><%= server.name %></h3>
                         <span class="status-dot <%= server.status %>" id="dot-<%= server.id %>"></span>
                     </div>
-                    <p style="color: var(--text-muted);"><%= server.type %> | Caminho: <%= server.path %></p>
+                    <p style="color: var(--text-muted);"><%= server.type %></p>
                     <p>Status: <strong id="status-<%= server.id %>"><%= server.status.toUpperCase() %></strong></p>
                     <a href="/server/<%= server.id %>">
                         <button class="btn btn-primary" style="width: 100%; margin-top: 10px;">Gerenciar Terminal</button>
