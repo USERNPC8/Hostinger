@@ -12,9 +12,9 @@
         <h2>Redwave ⚡</h2>
         <div class="sidebar-menu">
             <a href="/" class="menu-item active">🏠 Home</a>
-            <a href="/dashboard" class="menu-item">⚙️ Servidores</a>
-            <a href="/shop" class="menu-item">🛍️ Loja</a>
-            <a href="/profile" class="menu-item">👤 Perfil</a>
+            <a href="/servidores" class="menu-item">⚙️ Servidores</a>
+            <a href="/loja" class="menu-item">🛍️ Loja</a>
+            <a href="/perfil" class="menu-item">👤 Perfil</a>
             <a href="/logout" class="menu-item" style="margin-top: 50px;">🔴 Sair</a>
         </div>
     </div>
@@ -33,15 +33,15 @@
                         <option value="<%= template.name %>"><%= template.name %> (<%= template.url.split('/').pop().replace('.git', '') %>)</option>
                     <% }) %>
                 </select>
-                <input type="text" name="name" placeholder="Nome do Servidor" required style="flex-grow: 2;">
+                <input type="text" name="name" placeholder="Nome do Servidor (ex: MeuBot)" required style="flex-grow: 2;">
                 <button type="submit" class="btn btn-primary" style="flex-grow: 1;">Clonar e Criar</button>
             </form>
             <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 10px;">
-                ⚠️ **Atenção:** Instale as dependências com `npm install` na pasta clonada antes de iniciar.
+                ⚠️ **Atenção:** Instale as dependências com `npm install` na pasta clonada antes de iniciar o bot.
             </p>
         </div>
 
-        <h2>Servidores Ativos</h2>
+        <h2>Servidores Ativos (<%= servers.length %>)</h2>
         <div class="server-grid" id="server-grid">
             <% servers.forEach(server => { %>
                 <div class="card" id="card-<%= server.id %>">
@@ -49,7 +49,7 @@
                         <h3><%= server.name %></h3>
                         <span class="status-dot <%= server.status %>" id="dot-<%= server.id %>"></span>
                     </div>
-                    <p style="color: var(--text-muted);"><%= server.type %></p>
+                    <p style="color: var(--text-muted);"><%= server.type %> | Caminho: <%= server.path %></p>
                     <p>Status: <strong id="status-<%= server.id %>"><%= server.status.toUpperCase() %></strong></p>
                     <a href="/server/<%= server.id %>">
                         <button class="btn btn-primary" style="width: 100%; margin-top: 10px;">Gerenciar Terminal</button>
