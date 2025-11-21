@@ -1,4 +1,4 @@
-// index.js (Painel com Comando Input Integrado)
+// index.js (Painel Redwave - Versão Final)
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
@@ -6,12 +6,13 @@ const io = require('socket.io')(http);
 const bodyParser = require('body-parser');
 const { spawn, exec } = require('child_process');
 const fs = require('fs');
+const path = require('path');
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// --- CONFIGURAÇÃO DOS BOTS DO GITHUB (Sem alteração) ---
+// --- CONFIGURAÇÃO DOS BOTS DO GITHUB ---
 const botTemplates = [
     { name: 'BlackBot-WA', url: 'https://github.com/bronxys/Black.git', type: 'WhatsApp' },
     { name: 'NazunaBot-WA', url: 'https://github.com/bronxys/Nazuna.git', type: 'WhatsApp' }
@@ -29,12 +30,27 @@ function addLog(server, message, isError = false) {
     io.emit(`log-${server.id}`, logLine);
 }
 
-// --- ROTAS DO PAINEL ---
+// --- ROTAS PRINCIPAIS ---
 
 app.get('/', (req, res) => {
     res.render('dashboard', { servers: servers, botTemplates: botTemplates });
 });
 
+// Rotas para o Menu Lateral (Corrigidas)
+app.get('/servidores', (req, res) => {
+    res.redirect('/');
+});
+
+app.get('/loja', (req, res) => {
+    res.render('generic_page', { title: 'Loja', content: 'Em breve: Compre recursos e upgrades. A Rede está em manutenção.' });
+});
+
+app.get('/perfil', (req, res) => {
+    res.render('generic_page', { title: 'Perfil', content: 'Em breve: Gerencie sua conta e configurações. A Rede está em manutenção.' });
+});
+
+
+// Rota de Criação de Servidor (Git Clone)
 app.post('/create', (req, res) => {
     const templateName = req.body.template;
     const serverName = req.body.name.trim();
@@ -45,7 +61,7 @@ app.post('/create', (req, res) => {
     if (!template) return res.send('Erro: Template de bot inválido.');
     
     const folderName = serverName.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 30) + '-' + Date.now();
-    const serverPath = `./bots/${folderName}`;
+    const serverPath = path.join('./bots', folderName); // Usa path.join para compatibilidade
     
     if (!fs.existsSync('./bots')) {
         fs.mkdirSync('./bots');
@@ -68,13 +84,14 @@ app.post('/create', (req, res) => {
     exec(cloneCommand, { timeout: 120000 }, (error, stdout, stderr) => {
         if (error) {
             addLog(newServer, `[GIT ERRO] Falha ao clonar. ${error.message}`, true);
+            addLog(newServer, `[GIT ERRO] Certifique-se de que o GIT está instalado no sistema.`, true);
             newServer.status = 'error';
             io.emit('status-change', { id: newServer.id, status: 'error' });
             return;
         }
 
         addLog(newServer, `[GIT SUCESSO] Repositório clonado.`, false);
-        addLog(newServer, `[SISTEMA] Bot pronto. **AVISO**: Execute 'npm install' manualmente na pasta antes de INICIAR.`, true);
+        addLog(newServer, `[AVISO] Instale as dependências: vá para a pasta ${serverPath} e execute 'npm install'.`, true);
         
         newServer.status = 'offline';
         io.emit('status-change', { id: newServer.id, status: 'offline' });
@@ -89,11 +106,11 @@ app.get('/server/:id', (req, res) => {
     res.render('server', { server: server });
 });
 
-// --- CONTROLE VIA SOCKET.IO (START/STOP/COMMAND) ---
+// --- CONTROLE VIA SOCKET.IO ---
 
 io.on('connection', (socket) => {
     
-    // Novo evento: Enviar Comando para o Terminal (MUITO IMPORTANTE!)
+    // Enviar Comando para o Terminal
     socket.on('send-command', ({ serverId, command }) => {
         const server = servers.find(s => s.id == serverId);
         if (!server || server.status !== 'online' || !server.process) {
@@ -102,19 +119,16 @@ io.on('connection', (socket) => {
 
         const cleanCommand = command.trim();
         if (cleanCommand.length > 0) {
-            // Escreve o comando no stdin do processo do bot
+            // Escreve o comando no stdin do processo do bot (CORREÇÃO DE FLUXO)
             server.process.stdin.write(cleanCommand + '\n'); 
-            // Não é necessário adicionar ao log, pois o stdout/stderr do bot
-            // deve retornar a resposta, mas adicionamos para o feedback imediato
             addLog(server, `[COMANDO: ${cleanCommand}]`, false);
         }
     });
 
-    // ... (Mantém as funções start-server e stop-server sem alteração) ...
-    
+    // Iniciar Servidor
     socket.on('start-server', (serverId) => {
         const server = servers.find(s => s.id == serverId);
-        if (!server || server.status === 'online') return;
+        if (!server || server.status === 'online' || server.status === 'cloning') return;
 
         addLog(server, `[SISTEMA] Tentando iniciar bot...`);
         try {
@@ -138,10 +152,11 @@ io.on('connection', (socket) => {
             });
 
         } catch (error) {
-            addLog(server, `[ERRO CRÍTICO] Falha ao iniciar spawn: ${error.message}`, true);
+            addLog(server, `[ERRO CRÍTICO] Falha ao iniciar: ${error.message}`, true);
         }
     });
 
+    // Parar Servidor
     socket.on('stop-server', (serverId) => {
         const server = servers.find(s => s.id == serverId);
         if (!server || server.status !== 'online' || !server.process) return;
@@ -151,5 +166,5 @@ io.on('connection', (socket) => {
 });
 
 http.listen(3000, () => {
-    console.log('Painel de Hospedagem rodando em http://localhost:3000');
+    console.log('Painel de Hospedagem Redwave rodando em http://localhost:3000');
 });
