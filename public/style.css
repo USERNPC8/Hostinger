@@ -1,23 +1,23 @@
-/* public/style.css - Design Profissional Futurista (Redwave v2) */
+/* public/style.css - Design Redwave Profissional Futurista */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap');
 
 /* Variáveis de Cor */
 :root {
-    --bg-main: #0c0c10;         /* Fundo Principal: Preto Profundo */
-    --bg-sidebar: #15151e;      /* Fundo do Menu: Mais escuro, mas definido */
-    --bg-card: #1f1f2a;         /* Fundo do Cartão: Dark definido */
-    --primary: #ff004d;         /* Cor Principal: Vermelho Neon Vivo */
-    --primary-shadow: #ff004d40; /* Sombra Neon (40% opacidade) */
+    --bg-main: #0c0c10;         /* Fundo Principal */
+    --bg-sidebar: #15151e;      /* Fundo do Menu Lateral */
+    --bg-card: #1f1f2a;         /* Fundo do Cartão */
+    --primary: #ff004d;         /* Vermelho Neon Vivo */
+    --primary-shadow: #ff004d40; 
     --text-main: #e5e7eb;       
     --text-muted: #9ca3af;
-    --success: #00e676;         /* Sucesso: Verde Neon */
-    --danger: #ff004d;          /* Perigo/Erro */
-    --border-color: #33334d;    /* Borda sutil */
+    --success: #00e676;         /* Verde Neon */
+    --danger: #ff004d;          
+    --border-color: #33334d;    
     --input-bg: #2a2a35;
 }
 
 body {
-    font-family: 'Space Grotesk', sans-serif; /* Fonte moderna */
+    font-family: 'Space Grotesk', sans-serif;
     background-color: var(--bg-main);
     color: var(--text-main);
     margin: 0;
@@ -25,7 +25,7 @@ body {
     min-height: 100vh;
 }
 
-/* --- Layout Principal --- */
+/* --- Menu Lateral Fixo --- */
 
 .sidebar {
     width: 250px;
@@ -42,6 +42,7 @@ body {
     margin-bottom: 35px; 
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 15px;
+    text-shadow: 0 0 5px var(--primary-shadow);
 }
 
 .menu-item {
@@ -62,8 +63,9 @@ body {
 .main-content {
     flex: 1;
     padding: 40px;
-    width: calc(100% - 250px);
 }
+
+/* --- Layout e Componentes --- */
 
 .header {
     display: flex;
@@ -73,8 +75,6 @@ body {
     padding-bottom: 15px;
     border-bottom: 1px solid var(--border-color);
 }
-
-/* --- Cartões e Botões --- */
 
 .server-grid {
     display: grid;
@@ -90,26 +90,27 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
+/* Botões */
 .btn {
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
-    color: var(--bg-sidebar);
+    color: var(--text-main);
     transition: 0.2s;
     text-transform: uppercase;
 }
 .btn-primary { 
     background-color: var(--primary); 
     box-shadow: 0 0 5px var(--primary-shadow);
-    color: var(--text-main); /* Cor de texto alterada para contraste */
 }
-.btn-success { background-color: var(--success); }
+.btn-success { background-color: var(--success); color: var(--bg-card); }
 .btn-danger { background-color: var(--danger); }
 .btn:hover:not(:disabled) { opacity: 0.8; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* Inputs e Selects */
 input, select {
     background: var(--input-bg);
     border: 1px solid var(--border-color);
@@ -120,8 +121,7 @@ input, select {
     box-sizing: border-box;
 }
 
-/* --- Status e Terminal --- */
-
+/* Status Dot */
 .status-dot {
     height: 10px;
     width: 10px;
@@ -132,8 +132,13 @@ input, select {
 }
 .online { background-color: var(--success); color: var(--success); }
 .offline { background-color: var(--danger); color: var(--danger); }
-.cloning { background-color: yellow; color: yellow; }
+.cloning { background-color: #ffc107; color: #ffc107; animation: pulse 1s infinite; }
 .error { background-color: var(--danger); color: var(--danger); }
+
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+
+/* --- Terminal Style (Pterodactyl-like) --- */
 
 .terminal-window {
     background-color: #000000;
@@ -149,14 +154,14 @@ input, select {
 .log-line {
     margin: 2px 0;
     font-size: 13px;
-    color: #0f0; /* Saída padrão verde */
+    color: #0f0; /* Saída padrão verde neon */
 }
 .error-line {
-    color: var(--danger); /* Logs de erro em vermelho neon */
+    color: var(--danger);
     font-weight: 700;
 }
 
-/* --- Barra de Comando (Pterodactyl-like) --- */
+/* Barra de Comando */
 .command-bar {
     display: flex;
     margin-top: 10px;
