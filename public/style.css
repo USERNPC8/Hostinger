@@ -1,53 +1,68 @@
-/* Código completo do style.css para mobile e desktop */
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+/* public/style.css - Design Profissional Futurista (Redwave v2) */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap');
 
+/* Variáveis de Cor */
 :root {
-    --bg-dark: #0a0a0d;
-    --bg-card: #1a1a20;
-    --primary: #ff004d;
-    --primary-shadow: #ff004d40;
-    --text-main: #e5e7eb;
-    --text-muted: #7f8c8d;
-    --success: #00e676;
-    --danger: #ff004d;
-    --border-color: #3d0012;
+    --bg-main: #0c0c10;         /* Fundo Principal: Preto Profundo */
+    --bg-sidebar: #15151e;      /* Fundo do Menu: Mais escuro, mas definido */
+    --bg-card: #1f1f2a;         /* Fundo do Cartão: Dark definido */
+    --primary: #ff004d;         /* Cor Principal: Vermelho Neon Vivo */
+    --primary-shadow: #ff004d40; /* Sombra Neon (40% opacidade) */
+    --text-main: #e5e7eb;       
+    --text-muted: #9ca3af;
+    --success: #00e676;         /* Sucesso: Verde Neon */
+    --danger: #ff004d;          /* Perigo/Erro */
+    --border-color: #33334d;    /* Borda sutil */
+    --input-bg: #2a2a35;
 }
 
 body {
-    font-family: 'Roboto Mono', monospace; 
-    background-color: var(--bg-dark);
+    font-family: 'Space Grotesk', sans-serif; /* Fonte moderna */
+    background-color: var(--bg-main);
     color: var(--text-main);
     margin: 0;
     display: flex;
     min-height: 100vh;
 }
 
-/* Sidebar (Desktop Only) */
+/* --- Layout Principal --- */
+
 .sidebar {
     width: 250px;
-    background-color: var(--bg-card);
+    background-color: var(--bg-sidebar);
     padding: 20px;
     border-right: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    height: 100vh;
 }
 
-.sidebar h2 { color: var(--primary); margin-bottom: 30px; }
+.sidebar h2 { 
+    color: var(--primary); 
+    margin-bottom: 35px; 
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 15px;
+}
+
 .menu-item {
     display: block;
-    padding: 12px;
+    padding: 12px 10px;
     color: var(--text-muted);
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 4px;
     transition: 0.3s;
+    font-weight: 500;
 }
 .menu-item:hover, .menu-item.active {
     background-color: var(--primary);
-    color: white;
+    color: var(--bg-sidebar);
+    box-shadow: 0 0 8px var(--primary-shadow);
 }
 
-/* Conteúdo Principal */
 .main-content {
     flex: 1;
     padding: 40px;
+    width: calc(100% - 250px);
 }
 
 .header {
@@ -55,9 +70,12 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* Cards de Servidor */
+/* --- Cartões e Botões --- */
+
 .server-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -69,7 +87,40 @@ body {
     padding: 20px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--bg-sidebar);
+    transition: 0.2s;
+    text-transform: uppercase;
+}
+.btn-primary { 
+    background-color: var(--primary); 
+    box-shadow: 0 0 5px var(--primary-shadow);
+    color: var(--text-main); /* Cor de texto alterada para contraste */
+}
+.btn-success { background-color: var(--success); }
+.btn-danger { background-color: var(--danger); }
+.btn:hover:not(:disabled) { opacity: 0.8; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+input, select {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    color: var(--text-main);
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* --- Status e Terminal --- */
 
 .status-dot {
     height: 10px;
@@ -77,76 +128,85 @@ body {
     border-radius: 50%;
     display: inline-block;
     margin-right: 5px;
+    box-shadow: 0 0 5px currentColor;
 }
-.online { background-color: var(--success); box-shadow: 0 0 10px var(--success); }
-.offline { background-color: var(--danger); }
-.iniciando { background-color: yellow; }
+.online { background-color: var(--success); color: var(--success); }
+.offline { background-color: var(--danger); color: var(--danger); }
+.cloning { background-color: yellow; color: yellow; }
+.error { background-color: var(--danger); color: var(--danger); }
 
-/* Botões e Inputs */
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    color: white;
-    transition: 0.2s;
-    text-transform: uppercase;
-}
-.btn-primary { background-color: var(--primary); }
-.btn-success { background-color: var(--success); }
-.btn-danger { background-color: var(--danger); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-input, select {
-    background: var(--bg-dark);
-    border: 1px solid var(--border-color);
-    padding: 10px;
-    color: white;
-    border-radius: 4px;
-    width: 100%;
-    margin-bottom: 10px;
-}
-
-/* Terminal Style */
 .terminal-window {
     background-color: #000000;
     border-radius: 4px;
     padding: 15px;
-    font-family: 'Consolas', monospace;
+    font-family: 'Roboto Mono', monospace;
     height: 400px;
     overflow-y: scroll;
-    border: 1px solid #333;
+    border: 1px solid #1a1a20;
     margin-top: 20px;
+    line-height: 1.4;
 }
 .log-line {
     margin: 2px 0;
-    font-size: 14px;
-    color: #0f0; /* Verde Neon para logs */
+    font-size: 13px;
+    color: #0f0; /* Saída padrão verde */
 }
 .error-line {
     color: var(--danger); /* Logs de erro em vermelho neon */
+    font-weight: 700;
+}
+
+/* --- Barra de Comando (Pterodactyl-like) --- */
+.command-bar {
+    display: flex;
+    margin-top: 10px;
+}
+.command-bar input {
+    flex-grow: 1;
+    background: #000000;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border: 1px solid var(--border-color);
+    border-right: none;
+    font-family: 'Roboto Mono', monospace;
+}
+.command-bar button {
+    padding: 10px 15px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    width: auto;
+    font-size: 0.9em;
+    background-color: var(--primary);
 }
 
 
-/* RESPONSIVIDADE (CELULAR) */
+/* --- RESPONSIVIDADE (CELULAR) --- */
 @media (max-width: 768px) {
     body {
         flex-direction: column;
     }
     .sidebar {
         width: 100%;
-        padding: 15px;
+        height: auto;
+        position: static;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
-        display: none; /* Oculta a sidebar em mobile para dar espaço */
+        padding: 10px;
+    }
+    .sidebar h2 { margin: 5px 0 10px 0; padding-bottom: 5px; }
+    .sidebar-menu {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+    .menu-item {
+        flex-shrink: 0;
+        margin-right: 10px;
     }
     .main-content {
         padding: 20px 15px;
-    }
-    .header {
-        flex-direction: column;
-        align-items: flex-start;
+        width: 100%;
     }
     .actions {
         display: flex;
@@ -155,13 +215,13 @@ input, select {
         margin-top: 15px;
     }
     .actions button {
-        flex: 1; /* Ocupa metade da largura */
+        flex: 1;
         padding: 15px;
     }
     .server-grid {
         grid-template-columns: 1fr;
     }
     .terminal-window {
-        height: 300px; /* Reduz altura para telas menores */
+        height: 250px;
     }
 }
