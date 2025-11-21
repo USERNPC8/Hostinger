@@ -1,7 +1,7 @@
 {
   "name": "redwave-host",
   "version": "1.0.0",
-  "description": "Painel de Hospedagem para Bots",
+  "description": "Painel de Hospedagem de Bots Futurista",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
