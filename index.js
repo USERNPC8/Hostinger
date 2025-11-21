@@ -1,56 +1,95 @@
+// index.js (Painel com Git Clone)
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const bodyParser = require('body-parser');
-const { spawn } = require('child_process'); // Importação crucial para rodar o bot
+const { spawn, exec } = require('child_process'); // 'exec' é essencial para o 'git clone'
+const fs = require('fs'); // Para garantir que a pasta 'bots' exista
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Estrutura de Servidores (Simulação de DB)
-// Adicionamos 'path' e 'process' para gerenciamento real
-let servers = [
-    // Servidor de Exemplo Padrão (Você pode remover este bloco se preferir começar vazio)
-    {
-        id: 101,
-        name: 'BlackBot-Master',
-        type: 'WhatsApp',
-        path: './bots/BlackBot-Main', // ATENÇÃO: Verifique este caminho!
-        status: 'offline',
-        logs: [`[SISTEMA] Pronto para inicializar. Verifique o caminho: ./bots/BlackBot-Main`],
-        process: null // Guarda a referência do processo Node.js
-    }
+// --- CONFIGURAÇÃO DOS BOTS DO GITHUB ---
+const botTemplates = [
+    { name: 'BlackBot-WA', url: 'https://github.com/bronxys/Black.git', type: 'WhatsApp' },
+    { name: 'NazunaBot-WA', url: 'https://github.com/bronxys/Nazuna.git', type: 'WhatsApp' }
 ];
 
-// --- FUNÇÕES DE LOGS ---
+// --- SIMULAÇÃO DE BANCO DE DADOS (em memória) ---
+let servers = [];
+
+// --- FUNÇÕES DE LOGS E EMISSÃO DE EVENTOS ---
 
 function addLog(server, message, isError = false) {
     const time = new Date().toLocaleTimeString();
     const logLine = `[${time}] ${isError ? '🚨 ERROR' : ''} ${message}`;
     server.logs.push(logLine);
-    io.emit(`log-${server.id}`, logLine); // Envia o log em tempo real para o frontend
+    io.emit(`log-${server.id}`, logLine);
 }
 
 // --- ROTAS DO PAINEL ---
 
 app.get('/', (req, res) => {
-    res.render('dashboard', { servers: servers });
+    res.render('dashboard', { servers: servers, botTemplates: botTemplates });
 });
 
+// Rota de Criação de Servidor (Agora com Git Clone)
 app.post('/create', (req, res) => {
-    const serverPath = `./bots/${req.body.name.replace(/[^a-zA-Z0-9]/g, '-')}`;
+    const templateName = req.body.template;
+    const serverName = req.body.name.trim();
+    
+    if (!serverName) return res.send('O nome do servidor não pode ser vazio.');
+
+    const template = botTemplates.find(t => t.name === templateName);
+
+    if (!template) {
+        return res.send('Erro: Template de bot inválido.');
+    }
+    
+    // Cria um nome de pasta seguro
+    const folderName = serverName.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 30) + '-' + Date.now();
+    const serverPath = `./bots/${folderName}`;
+    
+    // Verifica se a pasta bots existe, se não, cria
+    if (!fs.existsSync('./bots')) {
+        fs.mkdirSync('./bots');
+    }
+
+    // Estrutura do novo servidor
     const newServer = {
         id: Date.now(),
-        name: req.body.name,
-        type: req.body.type,
-        path: serverPath, // O caminho onde o usuário deve colocar a pasta do bot
-        status: 'offline',
-        logs: [`[SISTEMA] Novo servidor criado. Crie a pasta ${serverPath} e coloque o código do bot dentro.`],
+        name: serverName,
+        type: template.type,
+        path: serverPath,
+        status: 'cloning', // Novo status
+        logs: [`[SISTEMA] Iniciando clone de ${template.name} de ${template.url}`],
         process: null
     };
     servers.push(newServer);
+    
+    // --- EXECUÇÃO DO GIT CLONE ---
+    const cloneCommand = `git clone ${template.url} ${serverPath}`;
+    addLog(newServer, `[GIT] Executando: ${cloneCommand}`);
+
+    exec(cloneCommand, { timeout: 120000 }, (error, stdout, stderr) => { // Timeout de 120s
+        if (error) {
+            addLog(newServer, `[GIT ERRO] Falha ao clonar. ${error.message}`, true);
+            addLog(newServer, `[GIT ERRO] Certifique-se de que o GIT está instalado.`, true);
+            newServer.status = 'error';
+            io.emit('status-change', { id: newServer.id, status: 'error' });
+            return;
+        }
+
+        addLog(newServer, `[GIT SUCESSO] Repositório clonado para ${serverPath}.`);
+        addLog(newServer, `[SISTEMA] Bot pronto para rodar. Execute 'npm install' manualmente na pasta do bot antes de INICIAR.`);
+        
+        newServer.status = 'offline';
+        io.emit('status-change', { id: newServer.id, status: 'offline' });
+    });
+
+    // Redireciona imediatamente para mostrar o servidor em status 'cloning'
     res.redirect('/');
 });
 
@@ -64,7 +103,6 @@ app.get('/server/:id', (req, res) => {
 
 io.on('connection', (socket) => {
     
-    // Iniciar Servidor (Onde a mágica acontece!)
     socket.on('start-server', (serverId) => {
         const server = servers.find(s => s.id == serverId);
         if (!server || server.status === 'online') return;
@@ -72,9 +110,9 @@ io.on('connection', (socket) => {
         addLog(server, `[SISTEMA] Tentando iniciar bot em ${server.path}...`);
 
         try {
-            // 1. Inicia o processo do bot (node index.js)
+            // INICIA O BOT: 'node index.js' DENTRO DA PASTA CLONADA
             const botProcess = spawn('node', ['index.js'], { 
-                cwd: server.path, // Define o diretório de trabalho do bot (MUITO IMPORTANTE!)
+                cwd: server.path, 
                 shell: true 
             });
 
@@ -82,17 +120,14 @@ io.on('connection', (socket) => {
             server.status = 'online';
             io.emit('status-change', { id: serverId, status: 'online' });
             
-            // 2. Captura e envia logs do stdout (saída padrão)
             botProcess.stdout.on('data', (data) => {
                 addLog(server, data.toString().trim());
             });
 
-            // 3. Captura e envia logs do stderr (erros)
             botProcess.stderr.on('data', (data) => {
                 addLog(server, data.toString().trim(), true);
             });
             
-            // 4. Lida com o processo sendo encerrado
             botProcess.on('exit', (code) => {
                 server.status = 'offline';
                 server.process = null;
@@ -105,13 +140,12 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Parar Servidor
     socket.on('stop-server', (serverId) => {
         const server = servers.find(s => s.id == serverId);
         if (!server || server.status !== 'online' || !server.process) return;
 
         addLog(server, `[SISTEMA] Tentando encerrar processo...`);
-        server.process.kill('SIGINT'); // Envia sinal para encerrar
+        server.process.kill('SIGINT');
     });
 });
 
