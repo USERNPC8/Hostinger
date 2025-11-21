@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Painel Redwave | Sistema Responsivo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
+        /* Variáveis de Cor - Esquema Vermelho Neon */
+        :root {
+            --bg-dark: #0a0a0d;         /* Fundo Principal: Preto Profundo */
+            --bg-card: #1a1a20;         /* Fundo do Cartão: Preto Levemente Mais Claro */
+            --primary: #ff004d;         /* Cor Principal: Vermelho Neon Vivo */
+            --primary-shadow: #ff004d40; /* Sombra Neon (40% opacidade) */
+            --text-main: #e5e7eb;       /* Texto Principal */
+            --text-muted: #7f8c8d;       /* Texto Secundário */
+            --success: #00e676;         /* Sucesso: Verde Neon (alto contraste) */
+            --danger: #ff004d;          /* Perigo/Erro: Usa o Vermelho Neon Principal */
+            --border-color: #3d0012;    /* Cor da Borda Fria */
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace; 
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden; /* Evita rolagem horizontal em celulares */
+        }
+
+        #app {
+            width: 90%;
+            max-width: 450px;
+            padding: 30px;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border-color); 
+            box-shadow: 0 0 30px var(--primary-shadow); 
+            animation: fadeIn 0.8s ease-out;
+            box-sizing: border-box; /* Inclui padding e border na largura total */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            text-shadow: 0 0 5px var(--primary-shadow); 
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-main);
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 5px var(--primary-shadow);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 10px var(--primary-shadow);
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #ff3377;
+            box-shadow: 0 4px 15px var(--primary-shadow);
+        }
+        
+        button:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .link-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: var(--text-muted);
+        }
+
+        .link-text a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            text-shadow: 0 0 1px var(--primary-shadow);
+        }
+
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .success {
+            background-color: var(--success);
+            color: var(--bg-card);
+            border: 1px solid #00994f;
+        }
+
+        .error {
+            background-color: var(--danger);
+            color: var(--bg-card);
+            border: 1px solid #cc0033;
+        }
+
+        /* =========================================== */
+        /* MEDIA QUERY PARA CELULARES (RESPONSIVIDADE) */
+        /* =========================================== */
+        @media (max-width: 500px) {
+            body {
+                /* Remove margens e garante o preenchimento da tela */
+                padding: 0;
+            }
+            #app {
+                width: 100%;
+                max-width: none;
+                height: 100vh; /* Ocupa a altura total em celulares */
+                padding: 20px;
+                border-radius: 0; /* Remove bordas arredondadas em tela cheia */
+                box-shadow: none;
+                border: none;
+                display: flex;
+                flex-direction: column;
+                justify-content: center; /* Centraliza verticalmente */
+            }
+            .view {
+                width: 100%;
+                max-width: 380px; /* Garante que o conteúdo não fique muito esticado */
+            }
+            h2 {
+                font-size: 1.6em;
+                margin-top: 0;
+                margin-bottom: 30px;
+            }
+            input, button {
+                padding: 18px; /* Aumenta a área de toque (finger-friendly) */
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <div id="login-view" class="view active">
+            <h2>LOGIN :: ACESSO HÍBRIDO</h2>
+            <div id="login-message" class="message" style="display: none;"></div>
+            <input type="text" id="login-username" placeholder="Usuário / Identificador" required>
+            <input type="password" id="login-password" placeholder="Chave de Acesso" required>
+            <button onclick="loginUser()">Entrar no Sistema</button>
+            <div class="link-text">
+                Não tem conta? <a onclick="switchView('register-view')">Criar Identidade</a>
+            </div>
+        </div>
+
+        <div id="register-view" class="view">
+            <h2>REGISTRO :: NOVA ID</h2>
+            <div id="register-message" class="message" style="display: none;"></div>
+            <input type="text" id="reg-username" placeholder="Nome de Usuário" required>
+            <input type="email" id="reg-email" placeholder="E-mail de Contato" required>
+            <input type="password" id="reg-password" placeholder="Senha Forte" required>
+            <button onclick="registerUser()">Registrar no Nó</button>
+            <div class="link-text">
+                Já tem ID? <a onclick="switchView('login-view')">Acessar</a>
+            </div>
+        </div>
+
+        <div id="dashboard-view" class="view">
+            <h2>STATUS :: PAINEL DE COMANDOS</h2>
+            <p>Conectado como: <strong id="dash-username" style="color: var(--primary);"></strong></p>
+            <p style="font-size: 1.4em; margin: 20px 0;">Créditos Atuais: <strong id="dash-balance" style="color: var(--success);">R$ 0,00</strong></p>
+            <button onclick="switchView('voucher-view')" class="btn-primary" style="margin-bottom: 15px;">Resgatar Código VOUCHER</button>
+            <button onclick="logoutUser()" style="background-color: var(--bg-card); border: 1px solid var(--primary); color: var(--primary); box-shadow: none;">Desconectar Sessão</button>
+        </div>
+
+        <div id="voucher-view" class="view">
+            <h2>VOUCHER :: CRÉDITO RÁPIDO</h2>
+            <div id="voucher-message" class="message" style="display: none;"></div>
+            <input type="text" id="voucher-code" placeholder="Insira o Código de Resgate" required>
+            <button onclick="redeemVoucher()">Resgatar Créditos</button>
+            <div class="link-text">
+                <a onclick="switchView('dashboard-view')">← Voltar aos Comandos</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CONFIGURAÇÃO INICIAL E DADOS (localStorage) ---
+
+        // Configuração de vouchers válidos
+        const VOUCHER_CODES = [
+            { code: 'REDNEON10', value: 10.00, maxUses: 100, currentUses: 0 },
+            { code: 'CYBER50', value: 50.00, maxUses: 1, currentUses: 0 }, 
+            { code: 'TEST1', value: 1.00, maxUses: 5, currentUses: 0 }
+        ];
+
+        function getVouchers() {
+            const stored = localStorage.getItem('vouchers');
+            if (stored) return JSON.parse(stored);
+            
+            localStorage.setItem('vouchers', JSON.stringify(VOUCHER_CODES));
+            return VOUCHER_CODES;
+        }
+        
+        function getUsers() {
+            const stored = localStorage.getItem('users');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        let CURRENT_USER = null;
+
+        // --- 2. FUNÇÕES DE UTILIDADE ---
+        
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById(viewId).classList.add('active');
+            
+            document.querySelectorAll('.message').forEach(msg => {
+                msg.style.display = 'none';
+            });
+
+            if (viewId === 'dashboard-view') {
+                updateDashboard();
+            }
+        }
+        
+        function showMessage(elementId, text, type) {
+            const el = document.getElementById(elementId);
+            el.textContent = text;
+            el.className = `message ${type}`;
+            el.style.display = 'block';
+        }
+
+        function updateDashboard() {
+            if (!CURRENT_USER) {
+                return switchView('login-view');
+            }
+            document.getElementById('dash-username').textContent = CURRENT_USER.username;
+            document.getElementById('dash-balance').textContent = `R$ ${CURRENT_USER.balance.toFixed(2).replace('.', ',')}`;
+        }
+
+
+        // --- 3. FUNÇÕES PRINCIPAIS ---
+
+        function registerUser() {
+            const username = document.getElementById('reg-username').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            
+            if (!username || !email || !password) {
+                return showMessage('register-message', 'Preencha todos os campos.', 'error');
+            }
+            
+            let users = getUsers();
+
+            if (users.some(u => u.username === username)) {
+                return showMessage('register-message', 'Nome de usuário já existe.', 'error');
+            }
+            if (users.some(u => u.email === email)) {
+                return showMessage('register-message', 'E-mail já registrado.', 'error');
+            }
+
+            const newUser = {
+                username: username,
+                password: password, 
+                email: email,
+                balance: 0.00,
+                usedVouchers: []
+            };
+
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showMessage('login-message', 'ID criada com sucesso! Faça login.', 'success');
+            switchView('login-view');
+        }
+
+        function loginUser() {
+            const inputIdentifier = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            
+            if (!inputIdentifier || !password) {
+                return showMessage('login-message', 'Preencha todos os campos.', 'error');
+            }
+            
+            const users = getUsers();
+            const user = users.find(u => (u.username === inputIdentifier || u.email === inputIdentifier) && u.password === password);
+
+            if (user) {
+                CURRENT_USER = user;
+                localStorage.setItem('currentUser', user.username);
+                switchView('dashboard-view');
+            } else {
+                showMessage('login-message', 'Credenciais inválidas. Tente novamente.', 'error');
+            }
+        }
+        
+        function logoutUser() {
+            CURRENT_USER = null;
+            localStorage.removeItem('currentUser');
+            switchView('login-view');
+        }
+        
+        function redeemVoucher() {
+            const code = document.getElementById('voucher-code').value.trim().toUpperCase();
+            
+            if (!CURRENT_USER) return showMessage('voucher-message', 'Erro: Usuário não logado.', 'error');
+            if (!code) return showMessage('voucher-message', 'Insira um código de resgate.', 'error');
+
+            let vouchers = getVouchers();
+            const voucher = vouchers.find(v => v.code === code);
+            let users = getUsers();
+            
+            // 1. Validação do Voucher
+            if (!voucher) {
+                return showMessage('voucher-message', 'Voucher inválido ou expirado.', 'error');
+            }
+            if (voucher.currentUses >= voucher.maxUses) {
+                return showMessage('voucher-message', 'Voucher esgotado. Limite de usos atingido.', 'error');
+            }
+            
+            // 2. Validação de Uso do Usuário
+            if (CURRENT_USER.usedVouchers.includes(code)) {
+                return showMessage('voucher-message', 'Você já usou este código de resgate.', 'error');
+            }
+            
+            // --- APLICAÇÃO DO VOUCHER ---
+            
+            const userIndex = users.findIndex(u => u.username === CURRENT_USER.username);
+            const voucherIndex = vouchers.findIndex(v => v.code === code);
+
+            users[userIndex].balance += voucher.value;
+            users[userIndex].usedVouchers.push(code);
+            
+            vouchers[voucherIndex].currentUses += 1;
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('vouchers', JSON.stringify(vouchers));
+            CURRENT_USER = users[userIndex]; 
+            
+            showMessage('voucher-message', `Voucher resgatado! R$ ${voucher.value.toFixed(2).replace('.', ',')} adicionados.`, 'success');
+            document.getElementById('voucher-code').value = '';
+            
+            setTimeout(() => switchView('dashboard-view'), 1500); 
+        }
+
+        // --- 4. INICIALIZAÇÃO ---
+
+        function init() {
+            const lastUser = localStorage.getItem('currentUser');
+            if (lastUser) {
+                const users = getUsers();
+                CURRENT_USER = users.find(u => u.username === lastUser);
+                if (CURRENT_USER) {
+                    return switchView('dashboard-view');
+                }
+            }
+            switchView('login-view');
+        }
+
+        getVouchers(); 
+        init();
+    </script>
+</body>
+</html>
