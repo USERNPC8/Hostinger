@@ -1,19 +1,19 @@
-/* public/style.css - Design Redwave Profissional Futurista */
+/* public/style.css - Design Redwave Profissional (Final) */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap');
 
-/* Variáveis de Cor */
+/* Variáveis de Cor - Esquema Neon Profissional */
 :root {
-    --bg-main: #0c0c10;         /* Fundo Principal */
-    --bg-sidebar: #15151e;      /* Fundo do Menu Lateral */
-    --bg-card: #1f1f2a;         /* Fundo do Cartão */
+    --bg-main: #0c0c10;         /* Fundo Principal: Escuro */
+    --bg-sidebar: #15151e;      /* Fundo do Menu: Levemente mais claro */
+    --bg-card: #21212c;         /* Fundo do Cartão: Mais definido */
     --primary: #ff004d;         /* Vermelho Neon Vivo */
-    --primary-shadow: #ff004d40; 
-    --text-main: #e5e7eb;       
+    --primary-shadow: #ff004d60; /* Sombra Neon (60% opacidade) */
+    --text-main: #e5e7eb;       /* Texto Claro */
     --text-muted: #9ca3af;
     --success: #00e676;         /* Verde Neon */
     --danger: #ff004d;          
-    --border-color: #33334d;    
-    --input-bg: #2a2a35;
+    --border-color: #3f3f5a;    /* Borda sutil */
+    --input-bg: #1a1a25;
 }
 
 body {
@@ -25,7 +25,7 @@ body {
     min-height: 100vh;
 }
 
-/* --- Menu Lateral Fixo --- */
+/* --- Menu Lateral Fixo (Desktop) --- */
 
 .sidebar {
     width: 250px;
@@ -35,6 +35,7 @@ body {
     position: sticky;
     top: 0;
     height: 100vh;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .sidebar h2 { 
@@ -42,7 +43,7 @@ body {
     margin-bottom: 35px; 
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 15px;
-    text-shadow: 0 0 5px var(--primary-shadow);
+    text-shadow: 0 0 8px var(--primary-shadow);
 }
 
 .menu-item {
@@ -51,21 +52,26 @@ body {
     color: var(--text-muted);
     text-decoration: none;
     border-radius: 4px;
-    transition: 0.3s;
+    transition: 0.2s ease-in-out;
     font-weight: 500;
 }
-.menu-item:hover, .menu-item.active {
+.menu-item:hover {
+    background-color: var(--bg-card);
+    color: var(--primary);
+}
+.menu-item.active {
     background-color: var(--primary);
     color: var(--bg-sidebar);
-    box-shadow: 0 0 8px var(--primary-shadow);
+    font-weight: 700;
+    box-shadow: 0 0 15px var(--primary-shadow);
+    transform: translateX(5px);
 }
 
 .main-content {
     flex: 1;
     padding: 40px;
+    overflow-y: auto;
 }
-
-/* --- Layout e Componentes --- */
 
 .header {
     display: flex;
@@ -76,25 +82,27 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
+/* --- Cartões e Formulário --- */
+
 .server-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    gap: 25px;
 }
 
 .card {
     background-color: var(--bg-card);
-    padding: 20px;
-    border-radius: 8px;
+    padding: 25px;
+    border-radius: 10px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* Botões */
 .btn {
-    padding: 10px 20px;
+    padding: 12px 20px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
     color: var(--text-main);
@@ -103,11 +111,14 @@ body {
 }
 .btn-primary { 
     background-color: var(--primary); 
-    box-shadow: 0 0 5px var(--primary-shadow);
+    box-shadow: 0 0 10px var(--primary-shadow);
 }
 .btn-success { background-color: var(--success); color: var(--bg-card); }
 .btn-danger { background-color: var(--danger); }
-.btn:hover:not(:disabled) { opacity: 0.8; }
+.btn:hover:not(:disabled) { 
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Inputs e Selects */
@@ -116,45 +127,49 @@ input, select {
     border: 1px solid var(--border-color);
     padding: 12px;
     color: var(--text-main);
-    border-radius: 4px;
+    border-radius: 6px;
     width: 100%;
     box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
 }
 
 /* Status Dot */
 .status-dot {
-    height: 10px;
-    width: 10px;
+    height: 12px;
+    width: 12px;
     border-radius: 50%;
     display: inline-block;
-    margin-right: 5px;
-    box-shadow: 0 0 5px currentColor;
+    margin-right: 8px;
+    box-shadow: 0 0 8px currentColor;
 }
 .online { background-color: var(--success); color: var(--success); }
 .offline { background-color: var(--danger); color: var(--danger); }
 .cloning { background-color: #ffc107; color: #ffc107; animation: pulse 1s infinite; }
 .error { background-color: var(--danger); color: var(--danger); }
 
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
 
 /* --- Terminal Style (Pterodactyl-like) --- */
 
 .terminal-window {
     background-color: #000000;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 15px;
     font-family: 'Roboto Mono', monospace;
-    height: 400px;
+    height: 350px; /* Mais baixo para mobile */
     overflow-y: scroll;
     border: 1px solid #1a1a20;
-    margin-top: 20px;
+    margin-top: 15px;
     line-height: 1.4;
+    white-space: pre-wrap; /* Garante que logs longos quebrem a linha */
 }
 .log-line {
     margin: 2px 0;
     font-size: 13px;
-    color: #0f0; /* Saída padrão verde neon */
+    color: #0f0; 
 }
 .error-line {
     color: var(--danger);
@@ -164,29 +179,27 @@ input, select {
 /* Barra de Comando */
 .command-bar {
     display: flex;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 .command-bar input {
     flex-grow: 1;
     background: #000000;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    border-radius: 0;
     border: 1px solid var(--border-color);
     border-right: none;
     font-family: 'Roboto Mono', monospace;
+    padding: 15px; /* Aumenta o padding para celular */
 }
 .command-bar button {
-    padding: 10px 15px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    padding: 15px 20px;
+    border-radius: 0;
     width: auto;
     font-size: 0.9em;
     background-color: var(--primary);
 }
 
 
-/* --- RESPONSIVIDADE (CELULAR) --- */
+/* --- RESPONSIVIDADE (CELULAR - FIX FINAL) --- */
 @media (max-width: 768px) {
     body {
         flex-direction: column;
@@ -197,22 +210,35 @@ input, select {
         position: static;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
-        padding: 10px;
+        padding: 10px 0;
     }
-    .sidebar h2 { margin: 5px 0 10px 0; padding-bottom: 5px; }
+    
+    /* Menu Horizontal para Mobile */
+    .sidebar h2 { 
+        display: none; /* Oculta o título na barra horizontal */
+    }
     .sidebar-menu {
         display: flex;
-        overflow-x: auto;
-        padding-bottom: 5px;
+        overflow-x: auto; /* Permite rolar o menu horizontalmente */
+        white-space: nowrap; 
+        padding: 5px 15px;
+        -webkit-overflow-scrolling: touch; /* Melhor rolagem no iOS */
     }
     .menu-item {
-        flex-shrink: 0;
-        margin-right: 10px;
+        flex-shrink: 0; /* Evita que os itens diminuam */
+        margin-right: 15px;
+        padding: 8px 15px; /* Mais compacto */
     }
+    .menu-item.active {
+        transform: none; /* Remove a transformação lateral no mobile */
+    }
+    
     .main-content {
         padding: 20px 15px;
         width: 100%;
     }
+    
+    /* Botões Grandes e Visíveis */
     .actions {
         display: flex;
         gap: 10px;
@@ -221,7 +247,8 @@ input, select {
     }
     .actions button {
         flex: 1;
-        padding: 15px;
+        padding: 18px; /* Aumenta a área de toque */
+        font-size: 1.1em;
     }
     .server-grid {
         grid-template-columns: 1fr;
