@@ -1,19 +1,19 @@
-/* public/style.css - Design Redwave CYBERPUNK FINAL */
+/* public/style.css - Design Redwave CYBERPUNK VERMELHO NEON (FINAL) */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap');
 
-/* Variáveis de Cor - Esquema Cyberpunk */
+/* Variáveis de Cor - Esquema Cyberpunk Vermelho */
 :root {
-    --bg-main: #0a0a10;         /* Fundo Principal: Quase preto */
-    --bg-sidebar: #10101b;      /* Fundo do Menu: Mais escuro, com profundidade */
-    --bg-card: #1f1f2a;         /* Fundo do Cartão: Definido e sólido */
-    --primary: #00e676;         /* Cor Principal: Verde Neon Forte (O contraste do painel) */
-    --secondary: #ff004d;       /* Cor Secundária: Vermelho Neon Vivo (Destaque e Erro) */
-    --primary-shadow: #00e67640; /* Sombra Neon Verde */
-    --text-main: #e5e7eb;       
-    --text-muted: #9ca3af;
-    --success: #00e676;         
-    --danger: #ff004d;          
-    --border-color: #3f3f5a;    
+    --bg-main: #0a0a10;         /* Fundo Principal */
+    --bg-sidebar: #151520;      /* Fundo do Menu */
+    --bg-card: #20202c;         /* Fundo do Cartão */
+    --primary: #FF004D;         /* COR PRINCIPAL: VERMELHO NEON VIBRANTE */
+    --secondary: #00E676;       /* Cor Secundária: Verde (para status OK e Terminal) */
+    --primary-shadow: #ff004d80; /* Sombra Neon Vermelha */
+    --text-main: #e8e8f2;       
+    --text-muted: #a0a0b5;
+    --success: #00E676;         
+    --danger: #FF004D;          
+    --border-color: #38384f;    
     --input-bg: #1a1a25;
 }
 
@@ -24,21 +24,21 @@ body {
     margin: 0;
     display: flex;
     min-height: 100vh;
-    overflow-x: hidden; /* Evita scroll lateral indesejado */
+    overflow-x: hidden;
 }
 
-/* --- Menu Lateral Fixo (Desktop) --- */
+/* --- MENU LATERAL FIXO (Desktop) --- */
 
 .sidebar {
     width: 250px;
     background-color: var(--bg-sidebar);
     padding: 20px;
-    border-right: 1px solid var(--border-color);
-    position: fixed; /* GARANTIA DE FIXAÇÃO */
+    border-right: 2px solid var(--primary); /* Borda VERMELHA */
+    position: fixed; 
     top: 0;
     left: 0;
     height: 100vh;
-    box-shadow: 3px 0 15px rgba(0, 0, 0, 0.7);
+    box-shadow: 3px 0 15px var(--primary-shadow);
     z-index: 1000;
 }
 
@@ -52,21 +52,21 @@ body {
 
 .menu-item {
     display: block;
-    padding: 12px 10px;
+    padding: 14px 10px;
     color: var(--text-muted);
     text-decoration: none;
     border-radius: 4px;
     transition: 0.2s ease-in-out;
     font-weight: 500;
-    border-left: 3px solid transparent;
+    border-left: 4px solid transparent; 
 }
 .menu-item:hover {
-    background-color: var(--bg-card);
+    background-color: #30304a; 
     color: var(--text-main);
     border-left-color: var(--primary);
 }
 .menu-item.active {
-    background: linear-gradient(90deg, #00e67610, transparent);
+    background: linear-gradient(90deg, #ff004d1a, transparent); 
     color: var(--primary);
     font-weight: 700;
     border-left-color: var(--primary);
@@ -76,205 +76,87 @@ body {
 .main-content {
     flex: 1;
     padding: 40px;
-    margin-left: 250px; /* Offset para o menu fixo */
+    margin-left: 250px; 
     width: calc(100% - 250px);
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-/* --- Cartões e Componentes --- */
-
-.server-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
-}
-
+/* --- Botões e Componentes --- */
 .card {
     background-color: var(--bg-card);
-    padding: 25px;
-    border-radius: 10px;
     border: 1px solid var(--border-color);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
-
-/* Botões */
-.btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    color: var(--bg-sidebar);
-    transition: 0.2s;
-    text-transform: uppercase;
-}
 .btn-primary { 
-    background-color: var(--secondary); 
-    box-shadow: 0 0 10px #ff004d60;
+    background-color: var(--primary); 
+    box-shadow: 0 0 10px var(--primary-shadow);
     color: var(--text-main);
 }
-.btn-success { background-color: var(--success); }
-.btn-danger { background-color: var(--danger); }
-.btn:hover:not(:disabled) { 
-    opacity: 0.9;
-    transform: translateY(-2px);
-}
-.btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-/* Inputs e Selects */
-input, select {
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    padding: 12px;
-    color: var(--text-main);
-    border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
-}
-input:focus, select:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 5px var(--primary-shadow);
-}
+.btn-success { background-color: var(--secondary); } 
+.btn-danger { background-color: var(--danger); } 
 
 /* Status Dot */
 .status-dot {
-    height: 12px;
-    width: 12px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 8px;
     box-shadow: 0 0 8px currentColor;
 }
 .online { background-color: var(--success); color: var(--success); }
 .offline { background-color: var(--danger); color: var(--danger); }
-.cloning { background-color: #ffc107; color: #ffc107; animation: pulse 1s infinite; }
-.error { background-color: var(--danger); color: var(--danger); }
 
-
-/* --- Terminal Style --- */
-
+/* --- TERMINAL FUTURISTA --- */
 .terminal-window {
     background-color: #000000;
-    border-radius: 6px;
-    padding: 15px;
     font-family: 'Roboto Mono', monospace;
-    height: 400px; 
-    overflow-y: scroll;
-    border: 1px solid #1a1a20;
-    margin-top: 15px;
-    line-height: 1.4;
-    white-space: pre-wrap;
+    color: var(--secondary); /* Texto do terminal VERDE NEON */
+    border: 1px solid var(--primary); /* Borda VERMELHA */
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
 }
 .log-line {
-    margin: 2px 0;
-    font-size: 13px;
-    color: var(--primary); /* Terminal em Verde Neon */
+    color: var(--secondary); 
 }
 .error-line {
     color: var(--danger);
     font-weight: 700;
 }
 
-/* Barra de Comando (Estilo Pterodactyl) */
-.command-bar {
-    display: flex;
-    margin-top: 5px;
-}
+/* Barra de Comando (100% FUNCIONAL QUANDO ONLINE) */
 .command-bar input {
-    flex-grow: 1;
+    color: var(--secondary); /* Input em Verde */
+    border: 1px solid var(--primary);
     background: #000000;
-    border-radius: 0;
-    border: 1px solid var(--border-color);
-    border-right: none;
-    font-family: 'Roboto Mono', monospace;
-    padding: 15px;
-    color: var(--primary);
-}
-.command-bar input:focus {
-    border-color: var(--primary);
 }
 .command-bar button {
-    padding: 15px 20px;
-    border-radius: 0;
-    width: auto;
-    font-size: 0.9em;
     background-color: var(--primary);
 }
 
 
-/* --- RESPONSIVIDADE (MOBILE - FIX DEFINITIVO) --- */
+/* --- RESPONSIVIDADE (MOBILE) --- */
 @media (max-width: 768px) {
     
+    /* Menu Rodapé FIXO */
     .sidebar {
         width: 100%;
         height: auto;
-        position: fixed; /* Mantém a barra fixa no topo */
-        bottom: 0; /* Coloca no rodapé para melhor acesso */
-        left: 0;
+        position: fixed; 
+        bottom: 0; 
         top: auto;
         border-right: none;
-        border-top: 1px solid var(--border-color);
+        border-top: 1px solid var(--primary); 
         box-shadow: 0 -3px 15px rgba(0, 0, 0, 0.7);
-        padding: 5px 0;
     }
-    
-    .sidebar h2 { display: none; }
-    
-    /* Menu Horizontal para Mobile */
-    .sidebar-menu {
-        display: flex;
-        justify-content: space-around;
-        overflow-x: auto; 
-        white-space: nowrap; 
-        padding: 5px 10px;
-    }
-    .menu-item {
-        flex-shrink: 0; 
-        margin: 0 5px;
-        padding: 10px 10px;
-        text-align: center;
-        border-left: none;
+    .main-content {
+        margin-left: 0; 
+        margin-bottom: 70px; 
+        width: 100%;
+        padding: 20px 15px;
     }
     .menu-item.active {
         background: var(--bg-card);
         color: var(--primary);
         border-bottom: 2px solid var(--primary);
+        border-left: none;
         box-shadow: none;
     }
-    
-    .main-content {
-        padding: 20px 15px;
-        margin-left: 0; /* Remove offset */
-        margin-bottom: 70px; /* Espaço para a barra de navegação inferior */
-        width: 100%;
-    }
-    
-    /* Botões Grandes e Visíveis */
-    .actions {
-        display: flex;
-        gap: 10px;
-        width: 100%;
-        margin-top: 15px;
-    }
     .actions button {
-        flex: 1;
         padding: 15px; 
         font-size: 1em;
-    }
-    .server-grid {
-        grid-template-columns: 1fr;
-    }
-    .terminal-window {
-        height: 250px;
     }
 }
