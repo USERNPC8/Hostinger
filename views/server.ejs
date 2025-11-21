@@ -11,9 +11,10 @@
     <div class="sidebar">
         <h2>Redwave ⚡</h2>
         <div class="sidebar-menu">
-            <a href="/" class="menu-item">🏠 Home</a>
+            <a href="/" class="menu-item">🏠 Servidores</a>
             <a href="/server/<%= server.id %>" class="menu-item active">⚙️ <%= server.name %></a>
             <a href="/loja" class="menu-item">🛍️ Loja</a>
+            <a href="/perfil" class="menu-item">👤 Perfil</a>
         </div>
     </div>
 
@@ -56,7 +57,7 @@
         const sendBtn = document.getElementById('send-btn');
         let currentStatus = '<%= server.status %>';
 
-        // --- Funções de UI e Status (CORRIGIDAS) ---
+        // --- Funções de UI e Status (GARANTINDO HABILITAÇÃO) ---
 
         function updateUI(status) {
             currentStatus = status;
@@ -66,7 +67,7 @@
             statusElement.innerHTML = `${dot} ${status.toUpperCase()}`;
             
             // Habilita/Desabilita botões
-            startBtn.disabled = status === 'online' || status === 'cloning' || status === 'error';
+            startBtn.disabled = status === 'online' || status === 'cloning' || status === 'error' || status === 'iniciando';
             stopBtn.disabled = status !== 'online';
             
             // Habilita/Desabilita barra de comando
@@ -102,6 +103,7 @@
 
         socket.on(`log-${serverId}`, (msg) => {
             const div = document.createElement('div');
+            // Garante que logs longos quebrem a linha no console
             div.className = msg.includes('🚨 ERROR') || msg.includes('[ERRO]') ? 'log-line error-line' : 'log-line'; 
             div.textContent = msg;
             terminal.appendChild(div);
