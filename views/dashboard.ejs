@@ -2,7 +2,8 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Nightwave Host - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redwave Host - Dashboard</title>
     <link rel="stylesheet" href="/style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
@@ -11,7 +12,7 @@
         <h2>Redwave⚡</h2>
         <a href="/" class="menu-item active">Meus Servidores</a>
         <a href="#" class="menu-item">Créditos</a>
-        <a href="#" class="menu-item">Suporte</a>
+        <a href="#" class="menu-item">Sair</a>
     </div>
 
     <div class="main-content">
@@ -20,15 +21,20 @@
         </div>
 
         <div class="card" style="margin-bottom: 30px;">
-            <h3>Novo Bot</h3>
-            <form action="/create" method="POST" style="display: flex; gap: 10px;">
-                <input type="text" name="name" placeholder="Nome do Servidor (ex: MeuBot)" required>
-                <select name="type">
-                    <option value="WhatsApp">Bot WhatsApp (Baileys)</option>
-                    <option value="Discord">Bot Discord</option>
+            <h3>Clonar Novo Servidor do GitHub</h3>
+            <form action="/create" method="POST" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <select name="template" required style="width: auto; flex-grow: 1; max-width: 250px;">
+                    <option value="" disabled selected>Escolha o Bot para Clonar</option>
+                    <% botTemplates.forEach(template => { %>
+                        <option value="<%= template.name %>"><%= template.name %> (Clona de <%= template.url.split('/').pop().replace('.git', '') %>)</option>
+                    <% }) %>
                 </select>
-                <button type="submit" class="btn btn-primary">Criar Servidor</button>
+                <input type="text" name="name" placeholder="Nome do Servidor (ex: MeuBotNovo)" required style="flex-grow: 2;">
+                <button type="submit" class="btn btn-primary" style="flex-grow: 1;">Clonar e Criar</button>
             </form>
+            <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 10px;">
+                ⚠️ **Atenção:** Após clonar, você precisa rodar `npm install` manualmente na pasta do bot antes de INICIAR.
+            </p>
         </div>
 
         <div class="server-grid" id="server-grid">
@@ -51,14 +57,15 @@
     <script>
         const socket = io();
         
-        // Escuta mudanças de status de qualquer servidor e atualiza o dashboard
         socket.on('status-change', (data) => {
             const dot = document.getElementById(`dot-${data.id}`);
             const statusText = document.getElementById(`status-${data.id}`);
             
             if (dot && statusText) {
-                dot.classList.remove('online', 'offline', 'iniciando...');
+                // Adiciona a classe 'cloning' se o status for esse
+                dot.classList.remove('online', 'offline', 'iniciando', 'cloning', 'error');
                 dot.classList.add(data.status);
+                
                 statusText.textContent = data.status.toUpperCase();
             }
         });
